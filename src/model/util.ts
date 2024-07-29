@@ -158,3 +158,8 @@ export async function getExchangeAndMarkets(
 
   return { exchange: exchange, markets: allMarkets };
 }
+
+export function printProgress(progress: string) {
+  console.clear();
+  console.log(progress);
+}

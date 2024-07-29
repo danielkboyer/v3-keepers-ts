@@ -1,1 +1,1 @@
-export * from "./timing.js";
+export * from "./timing";

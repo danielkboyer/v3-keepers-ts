@@ -2,7 +2,7 @@ import { ParclV3Sdk, getExchangePda, Address, translateAddress } from "@parcl-os
 import { Commitment, Connection, Keypair } from "@solana/web3.js";
 import bs58 from "bs58";
 import * as dotenv from "dotenv";
-import { LiquidatorBot } from "../model/liquidatorBot.js";
+import { LiquidatorBot } from "../model/liquidatorBot";
 dotenv.config();
 
 (async function main() {

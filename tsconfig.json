@@ -1,6 +1,6 @@
 {
   "compilerOptions": {
-    "target": "ES6",
+    "target": "ESNext",
     "module": "CommonJS",
     "allowJs": false,
     "declaration": true,
@@ -24,6 +24,5 @@
     "noUnusedParameters": true,
     "noImplicitAny": true
   },
-  "include": ["src"],
-  "esm": true
+  "include": ["src"]
 }

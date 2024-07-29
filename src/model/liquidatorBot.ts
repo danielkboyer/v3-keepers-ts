@@ -9,10 +9,10 @@ import {
   PriceFeedMap,
   ProgramAccount,
 } from "@parcl-oss/v3-sdk";
-import { BotStats } from "./botStats.js";
+import { BotStats } from "./botStats";
 import { Connection, Keypair } from "@solana/web3.js";
-import { TimedUpdater } from "./timedUpdater.js";
-import { EXCHANGE_UPDATE } from "../constants/index.js";
+import { TimedUpdater } from "./timedUpdater";
+import { EXCHANGE_UPDATE } from "../constants/index";
 import {
   ExchangeAndMarkets,
   getAccountMargins,
@@ -21,8 +21,8 @@ import {
   getMarketMapAndPriceFeedMap,
   liquidate,
   MarketMapAndPriceFeedMap,
-} from "./util.js";
-import logUpdate from "log-update";
+  printProgress,
+} from "./util";
 
 export class LiquidatorBot {
   private botStats: BotStats;
@@ -73,26 +73,25 @@ export class LiquidatorBot {
     }
 
     if (this.allMarginAccountsTracker.needsUpdate) {
-      this.allMarginAccountsTracker.updateBackground((allMarginAccounts) => {
-        var latestExchangeAndMarkets = this.exchangeLastUpdate.currentValue;
-        var latestMarketAndPriceMaps = this.marketAndPriceFeedMaps.currentValue;
+      var allMarginAccounts = await this.allMarginAccountsTracker.update();
+      var latestExchangeAndMarkets = this.exchangeLastUpdate.currentValue;
+      var latestMarketAndPriceMaps = this.marketAndPriceFeedMaps.currentValue;
 
-        if (latestExchangeAndMarkets !== undefined && latestMarketAndPriceMaps !== undefined) {
-          var atRiskAccounts = getAtRiskMarginAccounts(
-            allMarginAccounts,
-            latestExchangeAndMarkets.exchange,
-            latestMarketAndPriceMaps.markets,
-            latestMarketAndPriceMaps.priceFeeds,
-            this.marginPercentageWatch
-          );
+      if (latestExchangeAndMarkets !== undefined && latestMarketAndPriceMaps !== undefined) {
+        var atRiskAccounts = getAtRiskMarginAccounts(
+          allMarginAccounts,
+          latestExchangeAndMarkets.exchange,
+          latestMarketAndPriceMaps.markets,
+          latestMarketAndPriceMaps.priceFeeds,
+          this.marginPercentageWatch
+        );
 
-          this.marginAccountsInDanger = new TimedUpdater(
-            this.priceFeedInterval,
-            (prev) => this.updateAccountsInDanger(prev),
-            atRiskAccounts
-          );
-        }
-      });
+        this.marginAccountsInDanger = new TimedUpdater(
+          this.priceFeedInterval,
+          (prev) => this.updateAccountsInDanger(prev),
+          atRiskAccounts
+        );
+      }
     }
 
     var currentAtRiskAccounts = this.marginAccountsInDanger.currentValue;
@@ -129,7 +128,7 @@ export class LiquidatorBot {
       this.allMarginAccountsTracker.isBackgroundUpdating
     );
     if (this.enableLogging) {
-      logUpdate(this.botStats.toString());
+      printProgress(this.botStats.toString());
     }
 
     var endUpdate = Date.now();
